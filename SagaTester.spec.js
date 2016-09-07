@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import chaiAsPromised   from 'chai-as-promised';
 
-import SagaTester from './SagaTester';
+import SagaTester, { resetAction } from './SagaTester';
 
 chai.use(chaiAsPromised);
 
@@ -68,6 +68,31 @@ describe('SagaTester', () => {
 		const sagaTester = new SagaTester({initialState : someInitialState, reducers});
 		sagaTester.dispatch(someAction);
 		expect(sagaTester.getState()).to.deep.equal({someKey : someFinalValue});
+		expect(sagaTester.getActionsCalled()).to.deep.equal([someAction]);
+
+		// After reset, state reverts but action history remains
+		sagaTester.reset();
+		expect(sagaTester.getState()).to.deep.equal(someInitialState);
+		expect(sagaTester.getActionsCalled()).to.deep.equal([
+			someAction,
+			resetAction
+		]);
+	});
+
+	it('Resets the state of the store to the initial state and clears the action list', () => {
+		const someFinalValue = 'SOME_FINAL_VALUE';
+		const reducers = {
+			someKey : (state = someInitialValue, action) => action.type === someActionType  ? someFinalValue : state
+		};
+
+		const sagaTester = new SagaTester({initialState : someInitialState, reducers});
+		sagaTester.dispatch(someAction);
+		expect(sagaTester.getState()).to.deep.equal({someKey : someFinalValue});
+		expect(sagaTester.getActionsCalled()).to.deep.equal([someAction]);
+
+		sagaTester.reset(true);
+		expect(sagaTester.getState()).to.deep.equal(someInitialState);
+		expect(sagaTester.getActionsCalled()).to.deep.equal([]);
 	});
 
 	it('Returns whether or not an action was called', () => {

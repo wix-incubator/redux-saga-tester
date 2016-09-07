@@ -1,15 +1,16 @@
 import createSagaMiddleware from 'redux-saga';
 import { combineReducers, createStore, applyMiddleware } from 'redux';
 
-const RESET_TESTER = '@@RESET_TESTER';
+const RESET_TESTER_ACTION_TYPE = '@@RESET_TESTER';
 const makeResettable = (reducer, initialStateSlice) => (state, action) => {
     switch (action.type) {
-        case RESET_TESTER:
+        case RESET_TESTER_ACTION_TYPE:
             return reducer(initialStateSlice, action);
         default:
             return reducer(state, action);
     }
 };
+export const resetAction = { type : RESET_TESTER_ACTION_TYPE };
 
 export default class SagaIntegrationTester {
     constructor({initialState = {}, reducers, middlewares = []}) {
@@ -64,7 +65,7 @@ export default class SagaIntegrationTester {
     }
 
     reset(clearActionList = false) {
-        this.store.dispatch({type: RESET_TESTER});
+        this.store.dispatch(resetAction);
         if (clearActionList) {
             // Clear existing array in case there are other references to it
             this.actionsCalled.length = 0;
