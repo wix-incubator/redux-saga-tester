@@ -20,7 +20,7 @@ Suppose we have a saga that performs a REST call, dispatching a `FETCH_SUCCESS` 
 import fetchSaga from './saga';
 it('saves actions emitted from the saga', () => {
     const sagaTester = new SagaTester({});
-    sagaTester.start(fetchSaga);           // calls sagaMiddleware.run(fetchSaga)
+    sagaTester.start(fetchSaga); // calls sagaMiddleware.run(fetchSaga)
     const actionList = sagaTester.getActionsCalled();
     expect(actionList).to.deep.equal([{type : 'FETCH_SUCCESS'}]);
 })
@@ -37,11 +37,16 @@ it('listens to a specific action', done => {
 ```
 
 ## Full example
+
+Can be found under the `examples` directory.
+
 ```js
 import chai, { expect } from 'chai';
-import chaiAsPromised   from 'chai-as-promised';
-import {call, take, put} from 'redux-saga/effects';
-import SagaTester, { resetAction } from './SagaTester';
+import chaiAsPromised from 'chai-as-promised';
+import { call, take, put } from 'redux-saga/effects';
+import SagaTester, { resetAction } from '../';
+
+chai.use(chaiAsPromised);
 
 const someValue = 'SOME_VALUE';
 const someResult = 'SOME_RESULT';
@@ -51,8 +56,12 @@ const fetchRequestActionType = 'FETCH_REQUEST'
 const fetchSuccessActionType = 'FETCH_SUCCESS'
 
 const initialState = { someKey : someValue };
-const reducer = (state = someValue, action) => action.type === fetchSuccessActionType ? someOtherValue : state;
-const middleware = store => next => action => next({ ...action, meta : middlewareMeta });
+const reducer = (state = someValue, action) =>
+    action.type === fetchSuccessActionType ? someOtherValue : state;
+const middleware = store => next => action => next({
+    ...action,
+    meta : middlewareMeta
+});
 
 const fetchApi = () => someResult;
 
@@ -62,7 +71,7 @@ function* listenAndFetch() {
     yield put({ type : fetchSuccessActionType, payload : result });
 }
 
-it('Uses initial state, reducer, and middleware, runs sagas, stores actions, and resets', done => {
+it('Showcases the tester API', done => {
     // Start up the saga tester
     const sagaTester = new SagaTester({
         initialState,
@@ -82,14 +91,17 @@ it('Uses initial state, reducer, and middleware, runs sagas, stores actions, and
         });
 
         // Check that the new state was affected by the reducer
-        expect(sagaTester.getState()).to.deep.equal({ someKey : someOtherValue });
+        expect(sagaTester.getState()).to.deep.equal({
+            someKey : someOtherValue
+        });
 
         // Check that the saga listens only once
         sagaTester.dispatch({ type : fetchRequestActionType });
         expect(sagaTester.numCalled(fetchRequestActionType)).to.equal(2);
         expect(sagaTester.numCalled(fetchSuccessActionType)).to.equal(1);
 
-        // Reset the state and action list, dispatch again and check that it was called
+        // Reset the state and action list, dispatch again
+        // and check that it was called
         sagaTester.reset(true);
         expect(sagaTester.wasCalled(fetchRequestActionType)).to.equal(false);
         sagaTester.dispatch({ type : fetchRequestActionType });
@@ -101,5 +113,4 @@ it('Uses initial state, reducer, and middleware, runs sagas, stores actions, and
     // Dispatch the event to start the saga
     sagaTester.dispatch({type : fetchRequestActionType});
 })
-
 ```
