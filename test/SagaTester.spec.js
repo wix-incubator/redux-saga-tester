@@ -1,7 +1,7 @@
 import chai, { expect } from 'chai';
 import chaiAsPromised   from 'chai-as-promised';
 
-import SagaTester, { resetAction } from './SagaTester';
+import SagaTester, { resetAction } from '../src/SagaTester';
 
 chai.use(chaiAsPromised);
 

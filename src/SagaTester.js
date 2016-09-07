@@ -39,8 +39,8 @@ export default class SagaIntegrationTester {
         }
 
         const allMiddlewares = [
-            testerMiddleware,
             ...middlewares,
+            testerMiddleware,
             this.sagaMiddleware,
         ];
         this.store = createStore(
@@ -69,6 +69,8 @@ export default class SagaIntegrationTester {
         if (clearActionList) {
             // Clear existing array in case there are other references to it
             this.actionsCalled.length = 0;
+            // Delete object keys in case there are other references to it
+            Object.keys(this.actionLookups).forEach(key => delete this.actionLookups[key]);
         }
     }
 
