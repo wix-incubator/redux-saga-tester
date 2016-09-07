@@ -1,6 +1,6 @@
 {
   "name": "redux-saga-tester",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Full redux environment testing helper for redux-saga",
   "main": "dist/SagaTester.js",
   "scripts": {
