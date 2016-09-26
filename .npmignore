@@ -1,1 +1,3 @@
 .gitignore
+.babelrc
+pom.xml
