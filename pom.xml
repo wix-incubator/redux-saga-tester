@@ -34,5 +34,12 @@
                 <role>owner</role>
             </roles>
         </developer>
+        <developer>
+            <name>Guy Benron</name>
+            <email>guybe@wix.com</email>
+            <roles>
+                <role>owner</role>
+            </roles>
+        </developer>
     </developers>
 </project>
