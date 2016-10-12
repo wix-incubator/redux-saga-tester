@@ -8,7 +8,7 @@
     "test": "mocha --compilers js:babel-register",
     "compile": "babel -d dist/ src/",
     "build": ":",
-    "release": "wnpm-release -- --no-shrinkwrap"
+    "release": "npm install @wix/wnpm-ci && wnpm-release -- --no-shrinkwrap"
   },
   "repository": {
     "type": "git",
@@ -37,9 +37,6 @@
     "mocha": "^3.0.2",
     "redux": "^3.6.0",
     "redux-saga": "^0.11.1"
-  },
-  "optionalDependencies": {
-    "@wix/wnpm-ci": "*"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
