@@ -1,5 +1,5 @@
 import createSagaMiddleware from 'redux-saga';
-import { combineReducers, createStore, applyMiddleware } from 'redux';
+import { combineReducers as reduxCombineReducers, createStore, applyMiddleware } from 'redux';
 
 const RESET_TESTER_ACTION_TYPE = '@@RESET_TESTER';
 const makeResettable = (reducer, initialStateSlice) => (state, action) => {
@@ -13,7 +13,7 @@ const makeResettable = (reducer, initialStateSlice) => (state, action) => {
 export const resetAction = { type : RESET_TESTER_ACTION_TYPE };
 
 export default class SagaIntegrationTester {
-    constructor({initialState = {}, reducers, middlewares = []}) {
+    constructor({initialState = {}, reducers, middlewares = [], combineReducer = reduxCombineReducers}) {
         this.actionsCalled  = [];
         this.actionLookups  = {};
         this.sagaMiddleware = createSagaMiddleware();
