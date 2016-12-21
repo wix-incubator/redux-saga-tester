@@ -86,6 +86,10 @@ export default class SagaIntegrationTester {
         return this.actionsCalled;
     }
 
+    getLastActionCalled(num = 1) {
+        return this.actionsCalled.slice(-1 * num);
+    }
+
     wasCalled(actionType) {
         return !!this.actionLookups[actionType];
     }
