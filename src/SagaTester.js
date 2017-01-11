@@ -18,16 +18,12 @@ export default class SagaIntegrationTester {
         this.actionLookups  = {};
         this.sagaMiddleware = createSagaMiddleware();
 
-
         const finalReducer = (() => {
           // supply identity reducer as default
-          console.log('final reducer')
           if (!reducers) return state => state;
-          console.log('checking if function', typeof reducers)
           // use reducer function if already provided
           if (typeof reducers === 'function') return reducers;
           // .. or, wrap reducers so they can be reset
-          console.log('wrapping')
           return combineReducers(Object.keys(reducers).reduce((rc, reducerName) => ({
               ...rc,
               [reducerName] : makeResettable(reducers[reducerName], initialState[reducerName])
