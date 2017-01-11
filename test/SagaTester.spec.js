@@ -39,6 +39,15 @@ describe('SagaTester', () => {
 		expect(sagaTester.getState()).to.deep.equal({someKey : someFinalValue});
 	});
 
+  it('uses a reducer as a function if provided', () => {
+    let wasReducerCalled = false;
+    const reducerFn = () => wasReducerCalled = true;
+
+    const sagaTester = new SagaTester({reducers: reducerFn})
+		sagaTester.dispatch(someAction);
+		expect(wasReducerCalled).to.be.true;
+  })
+
 	it('Uses the supplied middlewares', () => {
 		let flag = false;
 		const middlewares = [

@@ -13,18 +13,26 @@ const makeResettable = (reducer, initialStateSlice) => (state, action) => {
 export const resetAction = { type : RESET_TESTER_ACTION_TYPE };
 
 export default class SagaIntegrationTester {
-    constructor({initialState = {}, reducers, middlewares = [], combineReducers = reduxCombineReducers}) {
+    constructor({initialState = {}, reducer, reducers, middlewares = [], combineReducers = reduxCombineReducers}) {
         this.actionsCalled  = [];
         this.actionLookups  = {};
         this.sagaMiddleware = createSagaMiddleware();
 
-        // Wrap reducers so they can be reset, or supply identity reducer as default
-        const finalReducer = reducers
-            ? combineReducers(Object.keys(reducers).reduce((rc, reducerName) => ({
-                    ...rc,
-                    [reducerName] : makeResettable(reducers[reducerName], initialState[reducerName])
-                }), {}))
-            : state => state;
+
+        const finalReducer = (() => {
+          // supply identity reducer as default
+          console.log('final reducer')
+          if (!reducers) return state => state;
+          console.log('checking if function', typeof reducers)
+          // use reducer function if already provided
+          if (typeof reducers === 'function') return reducers;
+          // .. or, wrap reducers so they can be reset
+          console.log('wrapping')
+          return combineReducers(Object.keys(reducers).reduce((rc, reducerName) => ({
+              ...rc,
+              [reducerName] : makeResettable(reducers[reducerName], initialState[reducerName])
+          }), {}));
+        })();
 
         // Middleware to store the actions and create promises
         const testerMiddleware = store => next => action => {
