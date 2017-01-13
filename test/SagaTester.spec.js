@@ -10,8 +10,10 @@ describe('SagaTester', () => {
 	const someInitialState = { someKey : someInitialValue };
 	const someActionType   = 'SOME_ACTION_TYPE';
 	const OtherActionType  = 'OTHER_ACTION_TYPE';
+	const reduxActionType  = '@@redux/ACTION_TYPE';
 	const someAction       = { type : someActionType };
 	const OtherAction      = { type : OtherActionType };
+	const reduxAction      = { type : reduxActionType };
 
 	it('Populates store with a given initial state', () => {
 		const sagaTester = new SagaTester({initialState : someInitialState});
@@ -27,6 +29,20 @@ describe('SagaTester', () => {
 			OtherAction,
 		]);
 	});
+
+    it('Ignores redux action types by default', () => {
+		const sagaTester = new SagaTester({});
+		sagaTester.dispatch(reduxAction);
+		expect(sagaTester.getActionsCalled()).to.deep.equal([]);
+    });
+
+    it('Captures redux action types if configured', () => {
+		const sagaTester = new SagaTester({ignoreReduxActions: false});
+		sagaTester.dispatch(reduxAction);
+		expect(sagaTester.getActionsCalled()).to.deep.equal([
+			reduxAction,
+		]);
+    });
 
 	it('Uses the supplied reducers', () => {
 		const someFinalValue = 'SOME_FINAL_VALUE';
