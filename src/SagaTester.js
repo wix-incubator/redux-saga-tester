@@ -13,7 +13,8 @@ const makeResettable = (reducer, initialStateSlice) => (state, action) => {
 export const resetAction = { type : RESET_TESTER_ACTION_TYPE };
 
 export default class SagaIntegrationTester {
-    constructor({initialState = {}, reducers, middlewares = [], combineReducers = reduxCombineReducers}) {
+    constructor({initialState = {}, reducers, middlewares = [],
+            combineReducers = reduxCombineReducers, ignoreReduxActions = true}) {
         this.actionsCalled  = [];
         this.actionLookups  = {};
         this.sagaMiddleware = createSagaMiddleware();
@@ -28,8 +29,9 @@ export default class SagaIntegrationTester {
 
         // Middleware to store the actions and create promises
         const testerMiddleware = store => next => action => {
-            // Don't monitor redux actions
-            if (!action.type.startsWith('@@redux')) {
+            if (ignoreReduxActions && action.type.startsWith('@@redux')) {
+                // Don't monitor redux actions
+            } else {
                 this.actionsCalled.push(action);
                 const actionObj = this._addAction(action.type);
                 actionObj.count++;
