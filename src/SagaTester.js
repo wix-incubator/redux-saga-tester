@@ -18,17 +18,18 @@ export default class SagaIntegrationTester {
         this.actionLookups  = {};
         this.sagaMiddleware = createSagaMiddleware();
 
-        const finalReducer = (() => {
+        const reducerFn = typeof reducers === 'object' ? combineReducers(reducers) : reducers
+
+        const finalReducer = (state, action) => {
+          // reset state if requested
+          if (action.type === RESET_TESTER_ACTION_TYPE) return initialState;
+
           // supply identity reducer as default
-          if (!reducers) return state => state;
-          // use reducer function if already provided
-          if (typeof reducers === 'function') return reducers;
-          // .. or, wrap reducers so they can be reset
-          return combineReducers(Object.keys(reducers).reduce((rc, reducerName) => ({
-              ...rc,
-              [reducerName] : makeResettable(reducers[reducerName], initialState[reducerName])
-          }), {}));
-        })();
+          if (!reducerFn) return initialState;
+
+          // otherwise use the provided reducer
+          return reducerFn(state, action);
+        };
 
         // Middleware to store the actions and create promises
         const testerMiddleware = store => next => action => {

@@ -104,6 +104,21 @@ describe('SagaTester', () => {
 		expect(sagaTester.getActionsCalled()).to.deep.equal([]);
 	});
 
+  it('Resets the state of the store to the initial state when using a reducer function', () => {
+		const someFinalValue = 'SOME_FINAL_VALUE';
+		const reducers = (state = {someKey: someInitialValue}, action) =>
+			(action.type === someActionType ? {someKey: someFinalValue} : state)
+
+		const sagaTester = new SagaTester({initialState : someInitialState, reducers});
+		sagaTester.dispatch(someAction);
+		expect(sagaTester.getState()).to.deep.equal({someKey : someFinalValue});
+		expect(sagaTester.getActionsCalled()).to.deep.equal([someAction]);
+
+		sagaTester.reset(true);
+		expect(sagaTester.getState()).to.deep.equal(someInitialState);
+		expect(sagaTester.getActionsCalled()).to.deep.equal([]);
+  });
+
 	it('Returns whether or not an action was called', () => {
 		const sagaTester = new SagaTester({});
 		expect(sagaTester.wasCalled(someActionType)).to.equal(false);
