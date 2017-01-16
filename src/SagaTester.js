@@ -2,14 +2,7 @@ import createSagaMiddleware from 'redux-saga';
 import { combineReducers as reduxCombineReducers, createStore, applyMiddleware } from 'redux';
 
 const RESET_TESTER_ACTION_TYPE = '@@RESET_TESTER';
-const makeResettable = (reducer, initialStateSlice) => (state, action) => {
-    switch (action.type) {
-        case RESET_TESTER_ACTION_TYPE:
-            return reducer(initialStateSlice, action);
-        default:
-            return reducer(state, action);
-    }
-};
+
 export const resetAction = { type : RESET_TESTER_ACTION_TYPE };
 
 export default class SagaIntegrationTester {
@@ -19,21 +12,21 @@ export default class SagaIntegrationTester {
         this.actionLookups  = {};
         this.sagaMiddleware = createSagaMiddleware();
 
-        const reducerFn = typeof reducers === 'object' ? combineReducers(reducers) : reducers
+        const reducerFn = typeof reducers === 'object' ? combineReducers(reducers) : reducers;
 
         const finalReducer = (state, action) => {
           // reset state if requested
-          if (action.type === RESET_TESTER_ACTION_TYPE) return initialState;
+            if (action.type === RESET_TESTER_ACTION_TYPE) return initialState;
 
           // supply identity reducer as default
-          if (!reducerFn) return initialState;
+            if (!reducerFn) return initialState;
 
           // otherwise use the provided reducer
-          return reducerFn(state, action);
+            return reducerFn(state, action);
         };
 
         // Middleware to store the actions and create promises
-        const testerMiddleware = store => next => action => {
+        const testerMiddleware = () => next => action => {
             if (ignoreReduxActions && action.type.startsWith('@@redux')) {
                 // Don't monitor redux actions
             } else {
@@ -43,7 +36,7 @@ export default class SagaIntegrationTester {
                 actionObj.callback(action);
             }
             return next(action);
-        }
+        };
 
         const allMiddlewares = [
             ...middlewares,
@@ -61,7 +54,7 @@ export default class SagaIntegrationTester {
         let action = this.actionLookups[actionType];
         if (!action || futureOnly) {
             action = { count : 0 };
-            action.promise = new Promise((resolve, reject) => action.callback = resolve);
+            action.promise = new Promise((resolve) => action.callback = resolve);
             this.actionLookups[actionType] = action;
         }
         return action;
