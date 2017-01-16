@@ -55,6 +55,15 @@ describe('SagaTester', () => {
 		expect(sagaTester.getState()).to.deep.equal({someKey : someFinalValue});
 	});
 
+  it('uses a reducer as a function if provided', () => {
+    let wasReducerCalled = false;
+    const reducerFn = () => wasReducerCalled = true;
+
+    const sagaTester = new SagaTester({reducers: reducerFn})
+		sagaTester.dispatch(someAction);
+		expect(wasReducerCalled).to.be.true;
+  })
+
 	it('Uses the supplied middlewares', () => {
 		let flag = false;
 		const middlewares = [
@@ -110,6 +119,21 @@ describe('SagaTester', () => {
 		expect(sagaTester.getState()).to.deep.equal(someInitialState);
 		expect(sagaTester.getActionsCalled()).to.deep.equal([]);
 	});
+
+  it('Resets the state of the store to the initial state when using a reducer function', () => {
+		const someFinalValue = 'SOME_FINAL_VALUE';
+		const reducers = (state = {someKey: someInitialValue}, action) =>
+			(action.type === someActionType ? {someKey: someFinalValue} : state)
+
+		const sagaTester = new SagaTester({initialState : someInitialState, reducers});
+		sagaTester.dispatch(someAction);
+		expect(sagaTester.getState()).to.deep.equal({someKey : someFinalValue});
+		expect(sagaTester.getActionsCalled()).to.deep.equal([someAction]);
+
+		sagaTester.reset(true);
+		expect(sagaTester.getState()).to.deep.equal(someInitialState);
+		expect(sagaTester.getActionsCalled()).to.deep.equal([]);
+  });
 
 	it('Returns whether or not an action was called', () => {
 		const sagaTester = new SagaTester({});
