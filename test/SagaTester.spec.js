@@ -6,14 +6,16 @@ import SagaTester, { resetAction } from '../src/SagaTester';
 chai.use(chaiAsPromised);
 
 describe('SagaTester', () => {
-    const someInitialValue = 'SOME_INITIAL_VALUE';
-    const someInitialState = { someKey : someInitialValue };
-    const someActionType   = 'SOME_ACTION_TYPE';
-    const OtherActionType  = 'OTHER_ACTION_TYPE';
-    const reduxActionType  = '@@redux/ACTION_TYPE';
-    const someAction       = { type : someActionType };
-    const OtherAction      = { type : OtherActionType };
-    const reduxAction      = { type : reduxActionType };
+    const someInitialValue  = 'SOME_INITIAL_VALUE';
+    const someInitialState  = { someKey : someInitialValue };
+    const someActionType    = 'SOME_ACTION_TYPE';
+    const otherActionType   = 'OTHER_ACTION_TYPE';
+    const anotherActionType = 'ANOTHER_ACTION_TYPE';
+    const reduxActionType   = '@@redux/ACTION_TYPE';
+    const someAction        = { type : someActionType };
+    const otherAction       = { type : otherActionType };
+    const anotherAction     = { type : anotherActionType };
+    const reduxAction       = { type : reduxActionType };
 
     it('Populates store with a given initial state', () => {
         const sagaTester = new SagaTester({initialState : someInitialState});
@@ -23,23 +25,23 @@ describe('SagaTester', () => {
     it('Saves a list of actions and returns it in order', () => {
         const sagaTester = new SagaTester({});
         sagaTester.dispatch(someAction);
-        sagaTester.dispatch(OtherAction);
-        expect(sagaTester.getActionsCalled()).to.deep.equal([
+        sagaTester.dispatch(otherAction);
+        expect(sagaTester.getCalledActions()).to.deep.equal([
             someAction,
-            OtherAction,
+            otherAction,
         ]);
     });
 
     it('Ignores redux action types by default', () => {
         const sagaTester = new SagaTester({});
         sagaTester.dispatch(reduxAction);
-        expect(sagaTester.getActionsCalled()).to.deep.equal([]);
+        expect(sagaTester.getCalledActions()).to.deep.equal([]);
     });
 
     it('Captures redux action types if configured', () => {
         const sagaTester = new SagaTester({ignoreReduxActions: false});
         sagaTester.dispatch(reduxAction);
-        expect(sagaTester.getActionsCalled()).to.deep.equal([
+        expect(sagaTester.getCalledActions()).to.deep.equal([
             reduxAction,
         ]);
     });
@@ -94,12 +96,12 @@ describe('SagaTester', () => {
         const sagaTester = new SagaTester({initialState : someInitialState, reducers});
         sagaTester.dispatch(someAction);
         expect(sagaTester.getState()).to.deep.equal({someKey : someFinalValue});
-        expect(sagaTester.getActionsCalled()).to.deep.equal([someAction]);
+        expect(sagaTester.getCalledActions()).to.deep.equal([someAction]);
 
 		// After reset, state reverts but action history remains
         sagaTester.reset();
         expect(sagaTester.getState()).to.deep.equal(someInitialState);
-        expect(sagaTester.getActionsCalled()).to.deep.equal([
+        expect(sagaTester.getCalledActions()).to.deep.equal([
             someAction,
             resetAction
         ]);
@@ -114,11 +116,11 @@ describe('SagaTester', () => {
         const sagaTester = new SagaTester({initialState : someInitialState, reducers});
         sagaTester.dispatch(someAction);
         expect(sagaTester.getState()).to.deep.equal({someKey : someFinalValue});
-        expect(sagaTester.getActionsCalled()).to.deep.equal([someAction]);
+        expect(sagaTester.getCalledActions()).to.deep.equal([someAction]);
 
         sagaTester.reset(true);
         expect(sagaTester.getState()).to.deep.equal(someInitialState);
-        expect(sagaTester.getActionsCalled()).to.deep.equal([]);
+        expect(sagaTester.getCalledActions()).to.deep.equal([]);
     });
 
     it('Resets the state of the store to the initial state when using a reducer function', () => {
@@ -129,11 +131,11 @@ describe('SagaTester', () => {
         const sagaTester = new SagaTester({initialState : someInitialState, reducers});
         sagaTester.dispatch(someAction);
         expect(sagaTester.getState()).to.deep.equal({someKey : someFinalValue});
-        expect(sagaTester.getActionsCalled()).to.deep.equal([someAction]);
+        expect(sagaTester.getCalledActions()).to.deep.equal([someAction]);
 
         sagaTester.reset(true);
         expect(sagaTester.getState()).to.deep.equal(someInitialState);
-        expect(sagaTester.getActionsCalled()).to.deep.equal([]);
+        expect(sagaTester.getCalledActions()).to.deep.equal([]);
     });
 
     it('Returns whether or not an action was called', () => {
@@ -171,5 +173,38 @@ describe('SagaTester', () => {
             sagaTester.dispatch(someAction);
             return expect(promise).to.be.fulfilled;
         });
+    });
+
+    it('Gets the latest called action', () => {
+        const sagaTester = new SagaTester({});
+        sagaTester.dispatch(someAction);
+        sagaTester.dispatch(otherAction);
+
+        expect(sagaTester.getLatestCalledAction()).to.deep.equal(otherAction);
+
+        sagaTester.dispatch(anotherAction);
+
+        expect(sagaTester.getLatestCalledAction()).to.deep.equal(anotherAction);
+    });
+
+    it('Gets the latest called actions', () => {
+        const sagaTester = new SagaTester({});
+        sagaTester.dispatch(someAction);
+        sagaTester.dispatch(otherAction);
+
+        expect(sagaTester.getLatestCalledActions()).to.deep.equal([otherAction]);
+        expect(sagaTester.getLatestCalledActions(1)).to.deep.equal([otherAction]);
+        expect(sagaTester.getLatestCalledActions(2)).to.deep.equal([
+            someAction, otherAction
+        ]);
+        expect(sagaTester.getLatestCalledActions(3)).to.deep.equal([
+            someAction, otherAction
+        ]);
+
+        sagaTester.dispatch(anotherAction);
+
+        expect(sagaTester.getLatestCalledActions(3)).to.deep.equal([
+            someAction, otherAction, anotherAction
+        ]);
     });
 });
