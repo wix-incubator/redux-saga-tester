@@ -36,7 +36,7 @@ describe('ourSaga test', () => {
         await sagaTester.waitFor(Actions.types.SUCCESS);
 
         // Check that the success action is what we expect it to be
-        expect(sagaTester.getLastActionCalled()).to.deep.equal([Actions.actions.success({data:expectedData})]);
+        expect(sagaTester.getLatestCalledAction()).to.deep.equal(Actions.actions.success({data:expectedData}));
     });
 });
 ```
@@ -99,7 +99,7 @@ it('Showcases the tester API', async () => {
     await sagaTester.waitFor(fetchSuccessActionType);
 
     // Check that all actions have the meta property from the middleware
-    sagaTester.getActionsCalled().forEach(action => {
+    sagaTester.getCalledActions().forEach(action => {
         expect(action.meta).to.equal(middlewareMeta)
     });
 
