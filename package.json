@@ -8,6 +8,7 @@
     "examples": "mocha --compilers js:babel-register './examples/**/*.js'",
     "prepublish": "npm test && npm run compile",
     "test": "mocha --compilers js:babel-register && npm run lint",
+    "test-dev": "mocha --watch --compilers js:babel-register",
     "compile": "babel -d dist/ src/",
     "build": ":",
     "release": "npm install @wix/wnpm-ci && wnpm-release -- --no-shrinkwrap"

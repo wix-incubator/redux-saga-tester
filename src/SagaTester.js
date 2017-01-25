@@ -6,9 +6,14 @@ const RESET_TESTER_ACTION_TYPE = '@@RESET_TESTER';
 export const resetAction = { type : RESET_TESTER_ACTION_TYPE };
 
 export default class SagaIntegrationTester {
-    constructor({initialState = {}, reducers, middlewares = [],
-            combineReducers = reduxCombineReducers, ignoreReduxActions = true}) {
-        this.actionsCalled  = [];
+    constructor({
+        initialState = {},
+        reducers,
+        middlewares = [],
+        combineReducers = reduxCombineReducers,
+        ignoreReduxActions = true
+    }) {
+        this.calledActions  = [];
         this.actionLookups  = {};
         this.sagaMiddleware = createSagaMiddleware();
 
@@ -30,7 +35,7 @@ export default class SagaIntegrationTester {
             if (ignoreReduxActions && action.type.startsWith('@@redux')) {
                 // Don't monitor redux actions
             } else {
-                this.actionsCalled.push(action);
+                this.calledActions.push(action);
                 const actionObj = this._addAction(action.type);
                 actionObj.count++;
                 actionObj.callback(action);
@@ -52,11 +57,13 @@ export default class SagaIntegrationTester {
 
     _addAction(actionType, futureOnly = false) {
         let action = this.actionLookups[actionType];
+
         if (!action || futureOnly) {
             action = { count : 0 };
             action.promise = new Promise((resolve) => action.callback = resolve);
             this.actionLookups[actionType] = action;
         }
+
         return action;
     }
 
@@ -68,7 +75,7 @@ export default class SagaIntegrationTester {
         this.store.dispatch(resetAction);
         if (clearActionList) {
             // Clear existing array in case there are other references to it
-            this.actionsCalled.length = 0;
+            this.calledActions.length = 0;
             // Delete object keys in case there are other references to it
             Object.keys(this.actionLookups).forEach(key => delete this.actionLookups[key]);
         }
@@ -82,12 +89,16 @@ export default class SagaIntegrationTester {
         return this.store.getState();
     }
 
-    getActionsCalled() {
-        return this.actionsCalled;
+    getCalledActions() {
+        return this.calledActions;
     }
 
-    getLastActionCalled(num = 1) {
-        return this.actionsCalled.slice(-1 * num);
+    getLatestCalledAction() {
+        return this.calledActions[this.calledActions.length - 1];
+    }
+
+    getLatestCalledActions(num = 1) {
+        return this.calledActions.slice(-1 * num);
     }
 
     wasCalled(actionType) {
@@ -96,6 +107,7 @@ export default class SagaIntegrationTester {
 
     numCalled(actionType) {
         const action = this.actionLookups[actionType];
+
         return action && action.count || 0;
     }
 
