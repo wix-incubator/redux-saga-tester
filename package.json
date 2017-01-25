@@ -4,7 +4,8 @@
   "description": "Full redux environment testing helper for redux-saga",
   "main": "dist/SagaTester.js",
   "scripts": {
-    "lint": "eslint './src/**/*.js' './test/**/*.js'",
+    "lint": "eslint './src/**/*.js' './test/**/*.js' './examples/**/*.js'",
+    "examples": "mocha --compilers js:babel-register './examples/**/*.js'",
     "prepublish": "npm test && npm run compile",
     "test": "mocha --compilers js:babel-register && npm run lint",
     "compile": "babel -d dist/ src/",
