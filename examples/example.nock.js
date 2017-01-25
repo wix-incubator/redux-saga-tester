@@ -41,9 +41,9 @@ describe('example.nock.js', () => {
         await sagaTester.waitFor(fetchSuccessActionType);
 
         // Check the resulting action
-        expect(sagaTester.getLastActionCalled()).to.deep.equal([{
+        expect(sagaTester.getLatestCalledAction()).to.deep.equal({
             type: fetchSuccessActionType,
             payload: fetchReply
-        }]);
+        });
     });
 });

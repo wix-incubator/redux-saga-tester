@@ -114,4 +114,14 @@ export default class SagaIntegrationTester {
     waitFor(actionType, futureOnly = false) {
         return this._addAction(actionType, futureOnly).promise;
     }
+
+    getActionsCalled() {
+        console.warn('[redux-saga-tester] Warning: getActionsCalled has been deprecated. Please use getCalledActions.');
+        return this.calledActions;
+    }
+
+    getLastActionCalled(num = 1) {
+        console.warn('[redux-saga-tester] Warning: getLastActionCalled has been deprecated. Please use getLatestCalledAction or getLatestCalledActions.');
+        return this.calledActions.slice(-1 * num);
+    }
 }

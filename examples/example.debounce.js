@@ -54,7 +54,7 @@ describe('example.debounce.js', () => {
         await sagaTester.waitFor(fetchSuccessActionType);
 
         // Check that all actions have the meta property from the middleware
-        sagaTester.getActionsCalled().forEach(action => {
+        sagaTester.getCalledActions().forEach(action => {
             expect(action.meta).to.equal(middlewareMeta);
         });
 
