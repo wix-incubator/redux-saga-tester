@@ -83,7 +83,10 @@ describe('SagaTester', () => {
             yield flag = true;
         };
         const sagaTester = new SagaTester({});
-        sagaTester.start(sagas);
+        const result = sagaTester.start(sagas);
+        // should get back a redux-saga task
+        expect(result).to.be.a('object');
+        expect(result).to.have.property('@@redux-saga/TASK', true);
         expect(flag).to.equal(true);
     });
 

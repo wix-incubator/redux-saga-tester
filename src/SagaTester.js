@@ -68,7 +68,7 @@ export default class SagaIntegrationTester {
     }
 
     start(sagas = [], ...args) {
-        this.sagaMiddleware.run(sagas, ...args);
+        return this.sagaMiddleware.run(sagas, ...args);
     }
 
     reset(clearActionList = false) {
