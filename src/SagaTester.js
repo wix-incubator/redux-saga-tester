@@ -11,11 +11,12 @@ export default class SagaIntegrationTester {
         reducers,
         middlewares = [],
         combineReducers = reduxCombineReducers,
-        ignoreReduxActions = true
+        ignoreReduxActions = true,
+        options = {},
     }) {
         this.calledActions  = [];
         this.actionLookups  = {};
-        this.sagaMiddleware = createSagaMiddleware();
+        this.sagaMiddleware = createSagaMiddleware(options);
 
         const reducerFn = typeof reducers === 'object' ? combineReducers(reducers) : reducers;
 
