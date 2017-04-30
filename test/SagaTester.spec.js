@@ -88,6 +88,17 @@ describe('SagaTester', () => {
         expect(flag).to.equal(true);
     });
 
+    it('Runs the supplied sagas', () => {
+        let flag = false;
+        const sagas = function*() {
+            yield flag = true;
+        };
+        const sagaTester = new SagaTester({});
+        const promise = sagaTester.run(sagas);
+        expect(promise).to.be.an.instanceof(Promise);
+        expect(flag).to.equal(true);
+    });
+
     it('Resets the state of the store to the initial state', () => {
         const someFinalValue = 'SOME_FINAL_VALUE';
         const reducers = {
