@@ -68,7 +68,8 @@ const middleware = store => next => action => next({
     ...action,
     meta : middlewareMeta
 });
-
+// options are passed to createSagaMiddleware
+const options = { onError => console.error.bind(console) }
 const fetchApi = () => someResult;
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
@@ -85,7 +86,8 @@ it('Showcases the tester API', async () => {
     const sagaTester = new SagaTester({
         initialState,
         reducers : { someKey : reducer },
-        middlewares : [middleware]
+        middlewares : [middleware],
+        options,
     });
     sagaTester.start(listenAndFetch);
 
