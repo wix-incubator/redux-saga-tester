@@ -77,13 +77,25 @@ describe('SagaTester', () => {
         expect(flag).to.equal(true);
     });
 
+    it('Starts the supplied sagas', () => {
+        let flag = false;
+        const sagas = function*() {
+            yield flag = true;
+        };
+        const sagaTester = new SagaTester({});
+        const task = sagaTester.start(sagas);
+        expect(task).to.be.an('object');
+        expect(flag).to.equal(true);
+    });
+
     it('Runs the supplied sagas', () => {
         let flag = false;
         const sagas = function*() {
             yield flag = true;
         };
         const sagaTester = new SagaTester({});
-        sagaTester.start(sagas);
+        const promise = sagaTester.run(sagas);
+        expect(promise).to.be.an.instanceof(Promise);
         expect(flag).to.equal(true);
     });
 
