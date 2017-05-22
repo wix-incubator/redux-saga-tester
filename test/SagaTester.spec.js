@@ -104,7 +104,7 @@ describe('SagaTester', () => {
         };
         const sagaTester = new SagaTester({});
         const promise = sagaTester.run(sagas);
-        expect(promise).to.be.an.instanceof(Promise);
+        expect(promise).to.be.a('promise');
         expect(flag).to.equal(true);
     });
 
