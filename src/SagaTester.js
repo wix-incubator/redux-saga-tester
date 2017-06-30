@@ -56,12 +56,19 @@ export default class SagaIntegrationTester {
         );
     }
 
+    _handleRootSagaException(e) {
+        Object.keys(this.actionLookups).forEach(key =>this.actionLookups[key].reject(e));
+    }
+
     _addAction(actionType, futureOnly = false) {
         let action = this.actionLookups[actionType];
 
         if (!action || futureOnly) {
             action = { count : 0 };
-            action.promise = new Promise((resolve) => action.callback = resolve);
+            action.promise = new Promise(function(resolve, reject){
+                action.callback = resolve;
+                action.reject = reject;
+            });
             this.actionLookups[actionType] = action;
         }
 
@@ -73,7 +80,9 @@ export default class SagaIntegrationTester {
     }
 
     start(sagas = [], ...args) {
-        return this.sagaMiddleware.run(sagas, ...args);
+        const task = this.sagaMiddleware.run(sagas, ...args);
+        task.done.catch((e) => this._handleRootSagaException(e));
+        return task;
     }
 
     reset(clearActionList = false) {
