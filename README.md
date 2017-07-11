@@ -50,7 +50,7 @@ Can be found under the `examples` directory.
 ```js
 import chaiAsPromised from 'chai-as-promised';
 import { call, take, put } from 'redux-saga/effects';
-import SagaTester from '../src/SagaTester.js';
+import SagaTester from 'redux-saga-tester';
 
 chai.use(chaiAsPromised);
 
