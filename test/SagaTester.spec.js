@@ -196,6 +196,20 @@ describe('SagaTester', () => {
         });
     });
 
+
+    it('Reject a promise if exception has bubbled to root saga', () => {
+        const reason = 'testcase';
+        const sagas = function*() {
+            yield;
+            throw new Error(reason);
+        };
+        const sagaTester = new SagaTester({});
+        sagaTester.run(sagas);
+
+        const promise = sagaTester.waitFor(someActionType);
+        return expect(promise).to.be.rejectedWith(Error, reason);
+    });
+
     it('Gets the latest called action', () => {
         const sagaTester = new SagaTester({});
         sagaTester.dispatch(someAction);
