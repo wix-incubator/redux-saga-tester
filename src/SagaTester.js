@@ -2,6 +2,7 @@ import createSagaMiddleware from 'redux-saga';
 import { combineReducers as reduxCombineReducers, createStore, applyMiddleware } from 'redux';
 
 const RESET_TESTER_ACTION_TYPE = '@@RESET_TESTER';
+const SET_STATE_TYPE = '@@SET_TESTER_STATE';
 
 export const resetAction = { type : RESET_TESTER_ACTION_TYPE };
 
@@ -18,14 +19,22 @@ export default class SagaIntegrationTester {
         this.actionLookups  = {};
         this.sagaMiddleware = createSagaMiddleware(options);
 
-        const reducerFn = typeof reducers === 'object' ? combineReducers(reducers) : reducers;
+        const reducerFn = typeof reducers === 'object' ? combineReducers(wrapReducers(reducers)) : reducers;
 
         const finalReducer = (state, action) => {
           // reset state if requested
             if (action.type === RESET_TESTER_ACTION_TYPE) return initialState;
 
           // supply identity reducer as default
-            if (!reducerFn) return initialState;
+            if (!reducerFn) {
+                let stateUpdate = {};
+
+                if (action.type === SET_STATE_TYPE) {
+                    stateUpdate = action.payload;
+                }
+
+                return Object.assign({}, initialState, stateUpdate);
+            }
 
           // otherwise use the provided reducer
             return reducerFn(state, action);
@@ -103,6 +112,10 @@ export default class SagaIntegrationTester {
         return this.store.getState();
     }
 
+    setState(newState) {
+        this.store.dispatch({type: SET_STATE_TYPE, payload: newState});
+    }
+
     getCalledActions() {
         return this.calledActions;
     }
@@ -138,4 +151,21 @@ export default class SagaIntegrationTester {
         console.warn('[redux-saga-tester] Warning: getLastActionCalled has been deprecated. Please use getLatestCalledAction or getLatestCalledActions.');
         return this.calledActions.slice(-1 * num);
     }
+}
+
+function wrapReducers (reducerList) {
+    return Object.keys(reducerList).reduce((result, name) => {
+        result[name] = (state, action) => {
+            const reducer = reducerList[name];
+            const {payload, type} = action;
+            let newState = reducer(state, action);
+
+            if (type === SET_STATE_TYPE && payload[name]) {
+                newState = Object.assign({}, state, payload[name]);
+            }
+
+            return newState;
+        };
+        return result;
+    }, {});
 }
