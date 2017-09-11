@@ -242,4 +242,37 @@ describe('SagaTester', () => {
             someAction, otherAction, anotherAction
         ]);
     });
+
+    it('Sets the state of the store - works similar to react\'s setState - no reducer', () => {
+        const someInitialState = {foo: 'bar', nestedFoo: {bo: 'jack'}};
+
+        let sagaTester = new SagaTester({initialState: someInitialState});
+        sagaTester.setState({foo: 5});
+        let newState = sagaTester.getState();
+        expect(newState.foo).to.equal(5);
+        expect(newState.nestedFoo).to.deep.equal(someInitialState.nestedFoo);
+
+        sagaTester = new SagaTester({initialState: someInitialState});
+        sagaTester.setState({nestedFoo: {bo: 'horseman'}});
+        newState = sagaTester.getState();
+        expect(newState.foo).to.equal('bar');
+        expect(newState.nestedFoo).to.deep.equal({bo: 'horseman'});
+    });
+
+    it('Sets the state of the store - works similar to react\'s setState - with reducer', () => {
+        const someInitialState = {foo: 'bar', nestedFoo: {bo: 'jack'}};
+        const someReducer = (state = someInitialState) => state;
+
+        let sagaTester = new SagaTester({reducers: {someReducer}});
+        sagaTester.setState({someReducer: {foo: 5}});
+        let newState = sagaTester.getState();
+        expect(newState.someReducer.foo).to.equal(5);
+        expect(newState.someReducer.nestedFoo).to.deep.equal(someInitialState.nestedFoo);
+
+        sagaTester = new SagaTester({reducers: {someReducer}});
+        sagaTester.setState({someReducer: {nestedFoo: {bo: 'horseman'}}});
+        newState = sagaTester.getState();
+        expect(newState.someReducer.foo).to.equal('bar');
+        expect(newState.someReducer.nestedFoo).to.deep.equal({bo: 'horseman'});
+    });
 });
