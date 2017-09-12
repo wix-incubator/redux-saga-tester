@@ -3,7 +3,7 @@ Full redux environment testing helper for redux-saga.
 
 [redux-saga](https://github.com/yelouafi/redux-saga/) is a great library that provides an easy way to test your sagas step-by-step, but it's tightly coupled to the saga implementation. Try a non-breaking reorder of the internal `yield`s, and the tests will fail.
 
-This tester library provides a full redux environment to run your sagas in, taking a black-box approach to testing. You can dispatch actions, observe the state of the store at any time, retrieve a history of actions, and listen for specific actions to occur.
+This tester library provides a full redux environment to run your sagas in, taking a black-box approach to testing. You can dispatch actions, observe the state of the store at any time, retrieve a history of actions and listen for specific actions to occur.
 
 # Getting Started
 
@@ -15,7 +15,7 @@ $ npm install --save-dev redux-saga-tester
 
 ## Basic Example
 
-Suppose we have a saga that waits for a START action, performs some async (or sync) actions (eg. fetching data from an API), and dispatches a `SUCCESS` action upon completion. Here's how would we test it:
+Suppose we have a saga that waits for a START action, performs some async (or sync) actions (eg. fetching data from an API), and dispatches a `SUCCESS` action upon completion. Here's how we would test it:
 ```js
 import ourSaga from './saga';
 
