@@ -11,7 +11,7 @@
     "test-dev": "mocha --watch --compilers js:babel-register",
     "compile": "babel -d dist/ src/",
     "build": ":",
-    "release": "npm install @wix/wnpm-ci && wnpm-release -- --no-shrinkwrap"
+    "release": "npm install wnpm-ci && wnpm-release -- --no-shrinkwrap"
   },
   "repository": {
     "type": "git",
