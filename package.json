@@ -11,7 +11,7 @@
     "test-dev": "mocha --watch --compilers js:babel-register",
     "compile": "babel -d dist/ src/",
     "build": ":",
-    "release": "npm install wnpm-ci && wnpm-release -- --no-shrinkwrap"
+    "release": "wnpm-release --no-shrinkwrap"
   },
   "repository": {
     "type": "git",
@@ -42,7 +42,8 @@
     "nock": "^9.0.13",
     "node-fetch": "^1.6.3",
     "redux": "^3.6.0",
-    "redux-saga": "^0.15.3"
+    "redux-saga": "^0.15.3",
+    "wnpm-ci": "^6.2.52"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
