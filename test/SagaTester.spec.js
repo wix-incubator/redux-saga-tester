@@ -275,4 +275,23 @@ describe('SagaTester', () => {
         expect(newState.someReducer.foo).to.equal('bar');
         expect(newState.someReducer.nestedFoo).to.deep.equal({bo: 'horseman'});
     });
+
+    it('Sets the state of the store - shouldn\'t be added to called actions list', () => {
+        const someInitialState = {foo: 'bar', nestedFoo: {bo: 'jack'}};
+        const someReducer = (state = someInitialState) => state;
+
+        let sagaTester = new SagaTester({reducers: {someReducer}});
+        sagaTester.setState({someReducer: {foo: 5}});
+        let newState = sagaTester.getState();
+        expect(newState.someReducer.foo).to.equal(5);
+        expect(newState.someReducer.nestedFoo).to.deep.equal(someInitialState.nestedFoo);
+        expect(sagaTester.getCalledActions().length).to.equal(0);
+
+        sagaTester = new SagaTester({reducers: {someReducer}});
+        sagaTester.setState({someReducer: {nestedFoo: {bo: 'horseman'}}});
+        newState = sagaTester.getState();
+        expect(newState.someReducer.foo).to.equal('bar');
+        expect(newState.someReducer.nestedFoo).to.deep.equal({bo: 'horseman'});
+        expect(sagaTester.getCalledActions().length).to.equal(0);
+    });
 });
