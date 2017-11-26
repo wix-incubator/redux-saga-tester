@@ -3,6 +3,7 @@ import { combineReducers as reduxCombineReducers, createStore, applyMiddleware }
 
 const RESET_TESTER_ACTION_TYPE = '@@RESET_TESTER';
 const SET_STATE_TYPE = '@@SET_TESTER_STATE';
+const UPDATE_STATE_TYPE = '@@UPDATE_TESTER_STATE';
 
 export const resetAction = { type : RESET_TESTER_ACTION_TYPE };
 
@@ -29,7 +30,7 @@ export default class SagaIntegrationTester {
             if (!reducerFn) {
                 let stateUpdate = {};
 
-                if (action.type === SET_STATE_TYPE) {
+                if ([SET_STATE_TYPE, UPDATE_STATE_TYPE].indexOf(action.type) > -1) {
                     stateUpdate = action.payload;
                 }
 
@@ -42,7 +43,7 @@ export default class SagaIntegrationTester {
 
         // Middleware to store the actions and create promises
         const testerMiddleware = () => next => action => {
-            if (ignoreReduxActions && action.type.startsWith('@@redux')) {
+            if (ignoreReduxActions && action.type.startsWith('@@redux') || action.type === UPDATE_STATE_TYPE) {
                 // Don't monitor redux actions
             } else {
                 this.calledActions.push(action);
@@ -113,7 +114,12 @@ export default class SagaIntegrationTester {
     }
 
     setState(newState) {
+        deprecate('setState has been deprecated. Please use updateState.');
         this.store.dispatch({type: SET_STATE_TYPE, payload: newState});
+    }
+
+    updateState(newState) {
+        this.store.dispatch({type: UPDATE_STATE_TYPE, payload: newState});
     }
 
     getCalledActions() {
@@ -143,12 +149,12 @@ export default class SagaIntegrationTester {
     }
 
     getActionsCalled() {
-        console.warn('[redux-saga-tester] Warning: getActionsCalled has been deprecated. Please use getCalledActions.');
+        deprecate('getActionsCalled has been deprecated. Please use getCalledActions.');
         return this.calledActions;
     }
 
     getLastActionCalled(num = 1) {
-        console.warn('[redux-saga-tester] Warning: getLastActionCalled has been deprecated. Please use getLatestCalledAction or getLatestCalledActions.');
+        deprecate('getLastActionCalled has been deprecated. Please use getLatestCalledAction or getLatestCalledActions.');
         return this.calledActions.slice(-1 * num);
     }
 }
@@ -160,7 +166,7 @@ function wrapReducers (reducerList) {
             const {payload, type} = action;
             let newState = reducer(state, action);
 
-            if (type === SET_STATE_TYPE && payload[name]) {
+            if ([SET_STATE_TYPE, UPDATE_STATE_TYPE].indexOf(type) > -1 && payload[name]) {
                 newState = Object.assign({}, state, payload[name]);
             }
 
@@ -168,4 +174,8 @@ function wrapReducers (reducerList) {
         };
         return result;
     }, {});
+}
+
+function deprecate(txt = '') {
+    console.warn(`[redux-saga-tester] Warning: ${txt}`);
 }

@@ -251,12 +251,14 @@ describe('SagaTester', () => {
         let newState = sagaTester.getState();
         expect(newState.foo).to.equal(5);
         expect(newState.nestedFoo).to.deep.equal(someInitialState.nestedFoo);
+        expect(sagaTester.getCalledActions().length).to.equal(1);  // this was a mistake, but leaving this for backward compatibility
 
         sagaTester = new SagaTester({initialState: someInitialState});
         sagaTester.setState({nestedFoo: {bo: 'horseman'}});
         newState = sagaTester.getState();
         expect(newState.foo).to.equal('bar');
         expect(newState.nestedFoo).to.deep.equal({bo: 'horseman'});
+        expect(sagaTester.getCalledActions().length).to.equal(1);  // this was a mistake, but leaving this for backward compatibility
     });
 
     it('Sets the state of the store - works similar to react\'s setState - with reducer', () => {
@@ -268,11 +270,50 @@ describe('SagaTester', () => {
         let newState = sagaTester.getState();
         expect(newState.someReducer.foo).to.equal(5);
         expect(newState.someReducer.nestedFoo).to.deep.equal(someInitialState.nestedFoo);
+        expect(sagaTester.getCalledActions().length).to.equal(1);  // this was a mistake, but leaving this for backward compatibility
 
         sagaTester = new SagaTester({reducers: {someReducer}});
         sagaTester.setState({someReducer: {nestedFoo: {bo: 'horseman'}}});
         newState = sagaTester.getState();
         expect(newState.someReducer.foo).to.equal('bar');
         expect(newState.someReducer.nestedFoo).to.deep.equal({bo: 'horseman'});
+        expect(sagaTester.getCalledActions().length).to.equal(1); // this was a mistake, but leaving this for backward compatibility
+    });
+
+    it('Updates the state of the store - newer version of setState (no counting) - no reducer', () => {
+        const someInitialState = {foo: 'bar', nestedFoo: {bo: 'jack'}};
+
+        let sagaTester = new SagaTester({initialState: someInitialState});
+        sagaTester.updateState({foo: 5});
+        let newState = sagaTester.getState();
+        expect(newState.foo).to.equal(5);
+        expect(newState.nestedFoo).to.deep.equal(someInitialState.nestedFoo);
+        expect(sagaTester.getCalledActions().length).to.equal(0);
+
+        sagaTester = new SagaTester({initialState: someInitialState});
+        sagaTester.updateState({nestedFoo: {bo: 'horseman'}});
+        newState = sagaTester.getState();
+        expect(newState.foo).to.equal('bar');
+        expect(newState.nestedFoo).to.deep.equal({bo: 'horseman'});
+        expect(sagaTester.getCalledActions().length).to.equal(0);
+    });
+
+    it('Updates the state of the store - newer version of setState (no counting) - with reducer', () => {
+        const someInitialState = {foo: 'bar', nestedFoo: {bo: 'jack'}};
+        const someReducer = (state = someInitialState) => state;
+
+        let sagaTester = new SagaTester({reducers: {someReducer}});
+        sagaTester.updateState({someReducer: {foo: 5}});
+        let newState = sagaTester.getState();
+        expect(newState.someReducer.foo).to.equal(5);
+        expect(newState.someReducer.nestedFoo).to.deep.equal(someInitialState.nestedFoo);
+        expect(sagaTester.getCalledActions().length).to.equal(0);
+
+        sagaTester = new SagaTester({reducers: {someReducer}});
+        sagaTester.updateState({someReducer: {nestedFoo: {bo: 'horseman'}}});
+        newState = sagaTester.getState();
+        expect(newState.someReducer.foo).to.equal('bar');
+        expect(newState.someReducer.nestedFoo).to.deep.equal({bo: 'horseman'});
+        expect(sagaTester.getCalledActions().length).to.equal(0);
     });
 });
