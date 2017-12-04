@@ -43,7 +43,7 @@ export default class SagaIntegrationTester {
 
         // Middleware to store the actions and create promises
         const testerMiddleware = () => next => action => {
-            if (ignoreReduxActions && action.type.startsWith('@@redux') || action.type === UPDATE_STATE_TYPE) {
+            if (ignoreReduxActions && action.type.startsWith('@@redux/') || action.type === UPDATE_STATE_TYPE) {
                 // Don't monitor redux actions
             } else {
                 this.calledActions.push(action);
