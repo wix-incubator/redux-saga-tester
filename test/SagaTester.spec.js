@@ -196,6 +196,17 @@ describe('SagaTester', () => {
         });
     });
 
+    it('Rejects if saga completes without emiting awaited action', () => {
+        const sagaTester = new SagaTester({});
+        const NON_EMITTED_ACTION = 'NON_EMITTED_ACTION';
+        const emptySaga = function*() {
+            yield;
+        };
+        sagaTester.run(emptySaga);
+        const wait = sagaTester.waitFor(NON_EMITTED_ACTION);
+
+        return expect(wait).to.be.rejectedWith(Error, NON_EMITTED_ACTION);
+    });
 
     it('Reject a promise if exception has bubbled to root saga', () => {
         const reason = 'testcase';

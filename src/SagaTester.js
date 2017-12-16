@@ -85,13 +85,25 @@ export default class SagaIntegrationTester {
         return action;
     }
 
+    _verifyAwaitedActionsCalled() {
+        Object.keys(this.actionLookups).forEach(actionType => {
+            const action = this.actionLookups[actionType];
+            if (action.count === 0 && action.reject) {
+                action.reject(
+                    new Error(actionType + ' was waited for but never called')
+                );
+            }
+        });
+    }
+
     run(sagas = [], ...args) {
         return this.start(sagas, ...args).done;
     }
 
     start(sagas = [], ...args) {
         const task = this.sagaMiddleware.run(sagas, ...args);
-        task.done.catch((e) => this._handleRootSagaException(e));
+        task.done.then(() => this._verifyAwaitedActionsCalled());
+        task.done.catch(e => this._handleRootSagaException(e));
         return task;
     }
 
