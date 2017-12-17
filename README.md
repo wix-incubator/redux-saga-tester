@@ -1,4 +1,5 @@
 # redux-saga-tester
+
 Full redux environment testing helper for redux-saga.
 
 [redux-saga](https://github.com/yelouafi/redux-saga/) is a great library that provides an easy way to test your sagas step-by-step, but it's tightly coupled to the saga implementation. Try a non-breaking reorder of the internal `yield`s, and the tests will fail.
@@ -16,6 +17,7 @@ $ npm install --save-dev redux-saga-tester
 ## Basic Example
 
 Suppose we have a saga that waits for a START action, performs some async (or sync) actions (eg. fetching data from an API), and dispatches a `SUCCESS` action upon completion. Here's how we would test it:
+
 ```js
 import ourSaga from './saga';
 
@@ -24,7 +26,7 @@ describe('ourSaga test', () => {
 
     beforeEach(() => {
         // Init code
-        sagaTester = new SagaTester({initialState});
+        sagaTester = new SagaTester({ initialState });
         sagaTester.start(ourSaga);
     });
 
@@ -36,7 +38,9 @@ describe('ourSaga test', () => {
         await sagaTester.waitFor(Actions.types.SUCCESS);
 
         // Check that the success action is what we expect it to be
-        expect(sagaTester.getLatestCalledAction()).to.deep.equal(Actions.actions.success({data:expectedData}));
+        expect(sagaTester.getLatestCalledAction()).to.deep.equal(
+            Actions.actions.success({ data: expectedData })
+        );
     });
 });
 ```
@@ -123,3 +127,66 @@ it('Showcases the tester API', async () => {
     expect(sagaTester.wasCalled(fetchRequestActionType)).to.equal(true);
 })
 ```
+
+## API
+
+#### `new SagaTester(options) => sagaTester`
+
+Create a new SagaTester instance.
+
+1. `options: Object`
+   * `initialState : Object`
+   * `reducers : Object | Function`
+   * `middlewares : Array[Function]`
+   * `combineReducers : Function`
+   * `ignoreReduxActions : Boolean`
+   * `options : Object`
+     * Options for `createSagaMiddleware` (see [docs](https://github.com/redux-saga/redux-saga/tree/master/docs/api#createsagamiddlewareoptions)).
+
+#### `sagaTester.start(saga)`
+
+Starts execution of the provided saga.
+
+#### `sagaTester.dispatch(action)`
+
+Dispatches an action to the redux store.
+
+#### `sagaTester.updateState(newState)`
+
+Assigns the `newState` into the current state.  
+_(Only works with the default reducer.)_
+
+#### `sagaTester.getState() => Object`
+
+Returns the state of the redux store.
+
+#### `sagaTester.waitFor(actionType, futureOnly) => Promise`
+
+Returns a promise that will resolve if the specified action is dispatched to the store.
+
+1. `actionType : String`
+2. `futureOnly : Boolean`
+   * Causes waitFor to only resolve if the action is called in the future.
+
+#### `sagaTester.wasCalled(actionType) => Boolean`
+
+Returns whether the specified was dispatched in the past.
+
+#### `sagaTester.numCalled(actionType) => Number`
+
+Returns the number of times an action with the given type was dispatched.
+
+#### `sagaTester.getLatestCalledAction() => Action`
+
+Returns the last action dispatched to the store.
+
+#### `sagaTester.getCalledActions() => Array[Actions]`
+
+Returns an array of all actions dispatched.
+
+#### `sagaTester.reset(clearActionList)`
+
+Reset the store state back to `initialState`.
+
+1. `clearActionList : Boolean`
+   * Clears the history of past actions (defaults to `false`).
