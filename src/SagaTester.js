@@ -86,12 +86,19 @@ export default class SagaIntegrationTester {
     }
 
     run(sagas = [], ...args) {
-        return this.start(sagas, ...args).done;
+        const task = this.start(sagas, ...args)
+        return (task.done == null) ? task.toPromise() : task.done;
     }
 
     start(sagas = [], ...args) {
         const task = this.sagaMiddleware.run(sagas, ...args);
-        task.done.catch((e) => this._handleRootSagaException(e));
+        const catchException = (e) => this._handleRootSagaException(e);
+        // redux-saga 1.0.0-beta.0 changed .catch to .toPromise()
+        if (task.done == null) {
+          task.toPromise().catch(catchException);
+        } else {
+          task.done.catch(catchException);
+        }
         return task;
     }
 
