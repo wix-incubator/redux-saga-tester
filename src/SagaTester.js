@@ -147,7 +147,9 @@ export default class SagaIntegrationTester {
     }
 
     wasCalled(actionType) {
-        return !!this.actionLookups[actionType];
+        const action = this.actionLookups[actionType];
+
+        return action ? action.count > 0 : false;
     }
 
     numCalled(actionType) {

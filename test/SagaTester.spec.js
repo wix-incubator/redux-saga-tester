@@ -165,6 +165,13 @@ describe('SagaTester', () => {
         sagaTester.dispatch(someAction);
     });
 
+    it('Returns whether or not an action was called (including a waitFor clause)', () => {
+        const sagaTester = new SagaTester({});
+        sagaTester.waitFor(someActionType);
+        expect(sagaTester.wasCalled(someActionType)).to.equal(false);
+        sagaTester.dispatch(someAction);
+    });
+
     it('Counts and returns the number of times an action was called', () => {
         const sagaTester = new SagaTester({});
         expect(sagaTester.numCalled(someActionType)).to.equal(0);
