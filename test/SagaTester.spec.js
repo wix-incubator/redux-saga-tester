@@ -1,5 +1,6 @@
 import chai, { expect } from 'chai';
 import chaiAsPromised   from 'chai-as-promised';
+import { fromJS } from 'immutable';
 
 import SagaTester, { resetAction } from '../src/SagaTester';
 
@@ -26,6 +27,7 @@ describe('SagaTester', () => {
         const sagaTester = () => new SagaTester({ options: { logger: 42 }});
         expect(sagaTester).to.throw('`options.logger` passed to the Saga middleware is not a function!');
     });
+
     it('Populates store with a given initial state', () => {
         const sagaTester = new SagaTester({initialState : someInitialState});
         expect(sagaTester.getState()).to.deep.equal(someInitialState);
@@ -67,7 +69,7 @@ describe('SagaTester', () => {
         expect(sagaTester.getState()).to.deep.equal({someKey : someFinalValue, someOtherKey: 1234});
     });
 
-    it('uses a reducer as a function if provided', () => {
+    it('Uses a reducer as a function if provided', () => {
         let wasReducerCalled = false;
         const reducerFn = () => wasReducerCalled = true;
 
@@ -333,5 +335,17 @@ describe('SagaTester', () => {
         expect(newState.someReducer.foo).to.equal('bar');
         expect(newState.someReducer.nestedFoo).to.deep.equal({bo: 'horseman'});
         expect(sagaTester.getCalledActions().length).to.equal(0);
+    });
+
+    it('Handles immutable data structures with the default reducer', () => {
+        const initialState = fromJS({ foo: 'initial' });
+        const expectedState = { foo: 'bar' };
+
+        const sagaTester = new SagaTester({ initialState });
+        sagaTester.updateState(expectedState);
+        const newState = sagaTester.getState();
+
+        expect(newState.toJS).to.be.a('function');
+        expect(newState.toJS()).to.deep.equal(expectedState);
     });
 });

@@ -34,6 +34,12 @@ export default class SagaIntegrationTester {
                     stateUpdate = action.payload;
                 }
 
+                // TODO: update this to use `.isImmutable()` as soon as v4 is released.
+                // http://facebook.github.io/immutable-js/docs/#/isImmutable
+                if (initialState.toJS) {
+                    return initialState.mergeDeep(stateUpdate);
+                }
+
                 return Object.assign({}, initialState, stateUpdate);
             }
 
@@ -67,7 +73,7 @@ export default class SagaIntegrationTester {
     }
 
     _handleRootSagaException(e) {
-        Object.keys(this.actionLookups).forEach(key =>this.actionLookups[key].reject(e));
+        Object.keys(this.actionLookups).forEach(key => this.actionLookups[key].reject(e));
     }
 
     _addAction(actionType, futureOnly = false) {
