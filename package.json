@@ -38,6 +38,7 @@
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "eslint": "^3.19.0",
+    "immutable": "^3.8.2",
     "mocha": "^3.4.1",
     "nock": "^9.0.13",
     "node-fetch": "^1.6.3",
