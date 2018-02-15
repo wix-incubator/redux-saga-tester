@@ -35,10 +35,10 @@ describe('ourSaga test', () => {
         sagaTester.dispatch(Actions.actions.start());
 
         // Wait for the saga to finish (it emits the SUCCESS action when its done)
-        await sagaTester.waitFor(Actions.types.SUCCESS);
+        const successAction = await sagaTester.waitFor(Actions.types.SUCCESS);
 
         // Check that the success action is what we expect it to be
-        expect(sagaTester.getLatestCalledAction()).to.deep.equal(
+        expect(successAction).to.deep.equal(
             Actions.actions.success({ data: expectedData })
         );
     });
@@ -153,20 +153,22 @@ Dispatches an action to the redux store.
 
 #### `sagaTester.updateState(newState)`
 
-Assigns the `newState` into the current state.  
+Assigns the `newState` into the current state.
 _(Only works with the default reducer.)_
 
 #### `sagaTester.getState() => Object`
 
 Returns the state of the redux store.
 
-#### `sagaTester.waitFor(actionType, futureOnly) => Promise`
+#### `sagaTester.waitFor(actionType, futureOnly) => Promise<action>`
 
 Returns a promise that will resolve if the specified action is dispatched to the store.
 
 1. `actionType : String`
 2. `futureOnly : Boolean`
    * Causes waitFor to only resolve if the action is called in the future.
+
+The promise resolves with the matching `action` object.
 
 #### `sagaTester.wasCalled(actionType) => Boolean`
 
