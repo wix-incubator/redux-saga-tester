@@ -30,7 +30,7 @@ describe('example.nock.js', () => {
             .reply(200, fetchReply);
 
         // Start up the saga tester
-        const sagaTester = new SagaTester({});
+        const sagaTester = new SagaTester();
 
         sagaTester.start(mySaga);
 

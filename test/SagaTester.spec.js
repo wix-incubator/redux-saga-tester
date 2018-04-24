@@ -28,13 +28,21 @@ describe('SagaTester', () => {
         expect(sagaTester).to.throw('`options.logger` passed to the Saga middleware is not a function!');
     });
 
+    it('Accepts empty arguments', () => {
+        expect(() => new SagaTester()).not.to.throw();
+    });
+
+    it('Accepts an empty object as an argument', () => {
+        expect(() => new SagaTester({})).not.to.throw();
+    });
+
     it('Populates store with a given initial state', () => {
         const sagaTester = new SagaTester({initialState : someInitialState});
         expect(sagaTester.getState()).to.deep.equal(someInitialState);
     });
 
     it('Saves a list of actions and returns it in order', () => {
-        const sagaTester = new SagaTester({});
+        const sagaTester = new SagaTester();
         sagaTester.dispatch(someAction);
         sagaTester.dispatch(otherAction);
         expect(sagaTester.getCalledActions()).to.deep.equal([
@@ -44,7 +52,7 @@ describe('SagaTester', () => {
     });
 
     it('Ignores redux action types by default', () => {
-        const sagaTester = new SagaTester({});
+        const sagaTester = new SagaTester();
         sagaTester.dispatch(reduxAction);
         expect(sagaTester.getCalledActions()).to.deep.equal([]);
     });
@@ -93,7 +101,7 @@ describe('SagaTester', () => {
         const sagas = function*() {
             yield flag = true;
         };
-        const sagaTester = new SagaTester({});
+        const sagaTester = new SagaTester();
         const task = sagaTester.start(sagas);
         expect(task).to.be.an('object');
         expect(flag).to.equal(true);
@@ -104,7 +112,7 @@ describe('SagaTester', () => {
         const sagas = function*() {
             yield flag = true;
         };
-        const sagaTester = new SagaTester({});
+        const sagaTester = new SagaTester();
         const promise = sagaTester.run(sagas);
         expect(promise).to.be.a('promise');
         expect(flag).to.equal(true);
@@ -162,20 +170,20 @@ describe('SagaTester', () => {
     });
 
     it('Returns whether or not an action was called', () => {
-        const sagaTester = new SagaTester({});
+        const sagaTester = new SagaTester();
         expect(sagaTester.wasCalled(someActionType)).to.equal(false);
         sagaTester.dispatch(someAction);
     });
 
     it('Returns whether or not an action was called (including a waitFor clause)', () => {
-        const sagaTester = new SagaTester({});
+        const sagaTester = new SagaTester();
         sagaTester.waitFor(someActionType);
         expect(sagaTester.wasCalled(someActionType)).to.equal(false);
         sagaTester.dispatch(someAction);
     });
 
     it('Counts and returns the number of times an action was called', () => {
-        const sagaTester = new SagaTester({});
+        const sagaTester = new SagaTester();
         expect(sagaTester.numCalled(someActionType)).to.equal(0);
         sagaTester.dispatch(someAction);
         expect(sagaTester.numCalled(someActionType)).to.equal(1);
@@ -184,19 +192,19 @@ describe('SagaTester', () => {
     });
 
     it('Returns a promise that will resolve in the future when a specific action is called', done => {
-        const sagaTester = new SagaTester({});
+        const sagaTester = new SagaTester();
         sagaTester.waitFor(someActionType).then(() => done());
         sagaTester.dispatch(someAction);
     });
 
     it('Returns a resolved promise when a specific action was already called', done => {
-        const sagaTester = new SagaTester({});
+        const sagaTester = new SagaTester();
         sagaTester.dispatch(someAction);
         sagaTester.waitFor(someActionType).then(() => done());
     });
 
     it('Returns a promise that will resolve in the future even after an action was called', () => {
-        const sagaTester = new SagaTester({});
+        const sagaTester = new SagaTester();
         sagaTester.dispatch(someAction);
         const promise = sagaTester.waitFor(someActionType, true);
         return expect(Promise.race([promise, Promise.resolve('fail')])).to.eventually.equal('fail').then(() => {
@@ -206,7 +214,7 @@ describe('SagaTester', () => {
     });
 
     it('Rejects if saga completes without emiting awaited action', () => {
-        const sagaTester = new SagaTester({});
+        const sagaTester = new SagaTester();
         const NON_EMITTED_ACTION = 'NON_EMITTED_ACTION';
         const emptySaga = function*() {
             yield;
@@ -223,7 +231,7 @@ describe('SagaTester', () => {
             yield;
             throw new Error(reason);
         };
-        const sagaTester = new SagaTester({});
+        const sagaTester = new SagaTester();
         sagaTester.run(sagas);
 
         const promise = sagaTester.waitFor(someActionType);
@@ -231,7 +239,7 @@ describe('SagaTester', () => {
     });
 
     it('Gets the latest called action', () => {
-        const sagaTester = new SagaTester({});
+        const sagaTester = new SagaTester();
         sagaTester.dispatch(someAction);
         sagaTester.dispatch(otherAction);
 
@@ -243,7 +251,7 @@ describe('SagaTester', () => {
     });
 
     it('Gets the latest called actions', () => {
-        const sagaTester = new SagaTester({});
+        const sagaTester = new SagaTester();
         sagaTester.dispatch(someAction);
         sagaTester.dispatch(otherAction);
 
