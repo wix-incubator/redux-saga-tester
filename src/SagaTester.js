@@ -141,7 +141,7 @@ export default class SagaIntegrationTester {
     }
 
     getCalledActions() {
-        return this.calledActions;
+        return this.calledActions.slice(); // shallow copy
     }
 
     getLatestCalledAction() {
