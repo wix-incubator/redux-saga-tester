@@ -143,9 +143,13 @@ Create a new SagaTester instance.
    * `options : Object`
      * Options for `createSagaMiddleware` (see [docs](https://github.com/redux-saga/redux-saga/tree/master/docs/api#createsagamiddlewareoptions)).
 
-#### `sagaTester.start(saga)`
-
+#### `sagaTester.start(saga, [...args])`
 Starts execution of the provided saga.
+
+1. `saga : Function`
+    * The saga generator function to start
+2. `[...args] : Any`
+    * *Optional* Arguments to pass to the generator on start
 
 #### `sagaTester.dispatch(action)`
 
