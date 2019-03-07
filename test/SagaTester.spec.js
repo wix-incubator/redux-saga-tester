@@ -21,11 +21,14 @@ describe('SagaTester', () => {
     it('Passes options to createSagaMiddleware', () => {
         // kind of backwards - we can't introspect the sagatester to see if our
         // options were passed in but we can observe its behavior, and passing in
-        // a non-function for a logger is something that redux-saga explicitly tests
-        // for (and throws an error on). so we can verify that doing the same thing
-        // here also throws an error, and thus our config is being passed on.
-        const sagaTester = () => new SagaTester({ options: { logger: 42 }});
-        expect(sagaTester).to.throw('`options.logger` passed to the Saga middleware is not a function!');
+        // a non-function for a channel (or logger, in redux-saga <1.0.0) is something
+        // that redux-saga explicitly tests for (and throws an error on). so we can
+        // verify that doing the same thing here also throws an error, and thus our
+        // config is being passed on.
+        const sagaTester = () => new SagaTester({ options: { channel: 42, logger: 42 }});
+        expect(sagaTester).to.throw(
+            /(\`options\.logger\`|options\.channel) passed to the Saga middleware is not a (function|channel)/,
+        );
     });
 
     it('Populates store with a given initial state', () => {
