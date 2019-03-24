@@ -48,7 +48,7 @@ describe('example.multiple.waitfor.js', () => {
             .reply(200, fetchReply);
 
         // Start up the saga tester
-        const sagaTester = new SagaTester({});
+        const sagaTester = new SagaTester();
 
         sagaTester.start(mySagaSync);
 
@@ -80,7 +80,7 @@ describe('example.multiple.waitfor.js', () => {
             .reply(200, fetchReply);
 
         // Start up the saga tester
-        const sagaTester = new SagaTester({});
+        const sagaTester = new SagaTester();
 
         sagaTester.start(mySagaAsync);
 

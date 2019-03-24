@@ -15,7 +15,7 @@ export default class SagaIntegrationTester {
         combineReducers = reduxCombineReducers,
         ignoreReduxActions = true,
         options = {},
-    }) {
+    } = {}) {
         this.calledActions  = [];
         this.actionLookups  = {};
         this.sagaMiddleware = createSagaMiddleware(options);
