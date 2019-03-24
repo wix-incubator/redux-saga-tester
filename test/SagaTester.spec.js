@@ -54,6 +54,17 @@ describe('SagaTester', () => {
         ]);
     });
 
+    it('Does not return internal reference to the list of actions', () => {
+        const sagaTester = new SagaTester({});
+        sagaTester.dispatch(someAction);
+        sagaTester.dispatch(otherAction);
+        sagaTester.getCalledActions().reverse();
+        expect(sagaTester.getCalledActions()).to.deep.equal([
+            someAction,
+            otherAction,
+        ]);
+    });
+
     it('Ignores redux action types by default', () => {
         const sagaTester = new SagaTester();
         sagaTester.dispatch(reduxAction);
