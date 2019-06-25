@@ -137,7 +137,7 @@ export default class SagaIntegrationTester {
     }
 
     dispatch(action) {
-        this.store.dispatch(action);
+        return this.store.dispatch(action);
     }
 
     getState() {

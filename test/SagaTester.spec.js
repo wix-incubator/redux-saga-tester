@@ -71,6 +71,12 @@ describe('SagaTester', () => {
         expect(sagaTester.getCalledActions()).to.deep.equal([]);
     });
 
+    it('Dispatch returns the result of dispatching the action', () => {
+        const sagaTester = new SagaTester();
+        const action = sagaTester.dispatch(reduxAction);
+        expect(action).to.equal(reduxAction);
+    });
+
     it('Captures redux action types if configured', () => {
         const sagaTester = new SagaTester({ignoreReduxActions: false});
         sagaTester.dispatch(reduxAction);
