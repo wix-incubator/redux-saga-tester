@@ -36,11 +36,11 @@ export default class SagaIntegrationTester {
 
                 // TODO: update this to use `.isImmutable()` as soon as v4 is released.
                 // http://facebook.github.io/immutable-js/docs/#/isImmutable
-                if (initialState.toJS) {
-                    return initialState.mergeDeep(stateUpdate);
+                if (state.toJS) {
+                    return state.mergeDeep(stateUpdate);
                 }
 
-                return Object.assign({}, initialState, stateUpdate);
+                return Object.assign({}, state, stateUpdate);
             }
 
           // otherwise use the provided reducer
