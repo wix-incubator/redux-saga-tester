@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "lib": ["dom", "es2015"],
+    "target": "es2020",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "declaration": true,
+    "noImplicitAny": true,
+    "skipLibCheck": false,
+    "strictNullChecks": true,
+    "esModuleInterop": false,
+    "strict": true
+  }
+}

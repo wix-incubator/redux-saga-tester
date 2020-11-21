@@ -6,20 +6,18 @@
   "scripts": {
     "lint": "eslint './src/**/*.js' './test/**/*.js' './examples/**/*.js'",
     "examples": "mocha --compilers js:babel-register './examples/**/*.js'",
-    "prepublish": "npm test && npm run compile",
     "test": "npm run test-0.15.3 && npm run test-1.0.2 && npm run lint",
-    "test-0.15.3": "npm i --no-save redux-saga@^0.15.3 && mocha --compilers js:babel-register",
-    "test-1.0.2": "npm i --no-save redux-saga@1.0.2 && mocha --compilers js:babel-register",
+    "test-0.15.3": "npm i --no-save redux-saga@^0.15.3 && jest",
+    "test-1.0.2": "npm i --no-save redux-saga@1.0.2 && jest",
     "test-dev": "npm run test-dev-0.15.3 && npm run test-dev-1.0.2",
-    "test-dev-0.15.3": "npm i --no-save redux-saga@^0.15.3 && mocha --watch --compilers js:babel-register",
-    "test-dev-1.0.2": "npm i --no-save redux-saga@1.0.2 && mocha --watch --compilers js:babel-register",
+    "test-dev-0.15.3": "npm i --no-save redux-saga@^0.15.3 && jest",
+    "test-dev-1.0.2": "npm i --no-save redux-saga@1.0.2 && jest",
     "compile": "babel -d dist/ src/",
-    "build": ":",
-    "release": "wnpm-release --no-shrinkwrap"
+    "build": "tsc -p tsconfig.build.json"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wix/redux-saga-tester.git"
+    "url": "https://github.com/moveaxlab/redux-saga-tester.git"
   },
   "keywords": [
     "redux-saga",
@@ -28,31 +26,22 @@
   "author": "Guy Benron",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/wix/redux-saga-tester/issues"
+    "url": "https://github.com/moveaxlab/redux-saga-tester/issues"
   },
-  "homepage": "https://github.com/wix/redux-saga-tester#readme",
+  "homepage": "https://github.com/moveaxlab/redux-saga-tester#readme",
   "devDependencies": {
-    "babel": "^6.5.2",
-    "babel-cli": "^6.24.1",
-    "babel-eslint": "^7.2.3",
-    "babel-plugin-transform-runtime": "^6.15.0",
-    "babel-preset-env": "^1.5.1",
-    "babel-register": "^6.24.1",
-    "chai": "^3.5.0",
-    "chai-as-promised": "^6.0.0",
-    "eslint": "^3.19.0",
+    "@moveax/eslint-config": "^0.3.1",
+    "@types/jest": "^25.2.3",
+    "@types/redux-saga": "^0.10.5",
+    "eslint": "6.0.0",
     "immutable": "^3.8.2",
-    "mocha": "^3.4.1",
-    "nock": "^9.0.13",
-    "node-fetch": "^1.6.3",
-    "redux": "^3.6.0",
-    "redux-saga": "^0.15.3",
-    "wnpm-ci": "^6.2.52"
+    "jest": "^26.0.1",
+    "redux": "^4.0.5",
+    "redux-saga": "^1.1.3",
+    "ts-jest": "^26.1.0",
+    "typescript": "^3.7.5"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
-  },
-  "dependencies": {
-      "babel-runtime": "^6.11.6"
   }
 }
