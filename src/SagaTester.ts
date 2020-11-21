@@ -11,12 +11,8 @@ import {
 } from 'redux';
 import { Saga } from '@redux-saga/types';
 import { SagaMiddleware } from '@redux-saga/core';
-import SagaTester, { SagaFunction, SagaTesterOptions } from './types';
-import {
-  RESET_TESTER_ACTION_TYPE,
-  SET_STATE_TYPE,
-  UPDATE_STATE_TYPE,
-} from './constants';
+import SagaTester, { SagaTesterOptions } from './types';
+import { RESET_TESTER_ACTION_TYPE } from './constants';
 
 export const resetAction = { type: RESET_TESTER_ACTION_TYPE };
 
@@ -40,7 +36,6 @@ export default class SagaIntegrationTester<S extends object> extends SagaTester<
 
   constructor(
     props: Partial<SagaTesterOptions<S>> = {
-      reducers: {},
       middlewares: [],
       combineReducers: reduxCombineReducers,
       ignoreReduxActions: true,
@@ -54,21 +49,20 @@ export default class SagaIntegrationTester<S extends object> extends SagaTester<
       combineReducers = reduxCombineReducers,
       ignoreReduxActions,
       options = {},
-      initialState = {},
+      initialState = { a: 'initialState' },
     } = props;
     this.calledActions = [];
     this.actionLookups = {};
     this.sagaMiddleware = createSagaMiddleware(options);
-    const defaultReducers: (
-      state: object
-    ) => ReducersMapObject = (init: {}) => {
+
+    const defaultReducers = (initialState: object): ReducersMapObject => {
       const red: ReducersMapObject = {};
-      console.log(init)
-      for (const [key, value] of Object.entries(init)) {
-        red[key] = (state: unknown = value, _action: AnyAction) => state;
+      for (const [key, value] of Object.entries(initialState)) {
+        red[key] = (state: typeof value = value, _action: AnyAction) => state;
       }
       return red;
     };
+
     const reducerFn = combineReducers(
       reducers ?? defaultReducers(initialState)
     );
@@ -86,11 +80,7 @@ export default class SagaIntegrationTester<S extends object> extends SagaTester<
 
       // supply identity reducer as default
       if (!reducerFn) {
-        let stateUpdate = {};
-
-        if ([SET_STATE_TYPE, UPDATE_STATE_TYPE].includes(action.type)) {
-          stateUpdate = action.payload!;
-        }
+        const stateUpdate = {};
 
         return Object.assign({}, finalInitialState, stateUpdate);
       }
@@ -103,10 +93,7 @@ export default class SagaIntegrationTester<S extends object> extends SagaTester<
     const testerMiddleware = () => (next: (arg0: AnyAction) => AnyAction) => (
       action: AnyAction
     ) => {
-      if (
-        (ignoreReduxActions && action.type.startsWith('@@redux/')) ||
-        action.type === UPDATE_STATE_TYPE
-      ) {
+      if (ignoreReduxActions && action.type.startsWith('@@redux/')) {
         // Don't monitor redux actions
       } else {
         this.calledActions.push(action);
@@ -155,8 +142,7 @@ export default class SagaIntegrationTester<S extends object> extends SagaTester<
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  run(sagas: Saga<any[]>, ...args: unknown[]) {
+  run<S extends Saga>(sagas: S, ...args: Parameters<S>) {
     const task = this.start(sagas, ...args);
     if (task.result != null) {
       return task.result;
@@ -165,7 +151,7 @@ export default class SagaIntegrationTester<S extends object> extends SagaTester<
     }
   }
 
-  start(sagas: Saga<any[]>, ...args: unknown[]) {
+  start<S extends Saga>(sagas: S, ...args: Parameters<S>) {
     const task = this.sagaMiddleware.run(sagas, ...args);
     const onDone = () => this._verifyAwaitedActionsCalled();
     const onCatch = (e: Error) => this._handleRootSagaException(e);
@@ -194,10 +180,6 @@ export default class SagaIntegrationTester<S extends object> extends SagaTester<
 
   getState(): S {
     return this.store.getState();
-  }
-
-  updateState(newState: Partial<S>) {
-    this.store.dispatch({ type: UPDATE_STATE_TYPE, payload: newState });
   }
 
   getCalledActions() {

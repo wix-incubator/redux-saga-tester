@@ -1,5 +1,3 @@
-import { fromJS } from 'immutable';
-// @ts-nocheck
 import SagaTester, { resetAction } from '../src/SagaTester';
 import { Reducer } from 'redux';
 
@@ -127,7 +125,7 @@ describe('SagaTester', () => {
     };
     const sagaTester = new SagaTester();
     const promise = sagaTester.run(sagas);
-    expect(typeof promise).toBe('promise');
+    expect(promise).toBeInstanceOf(Function);
     expect(flag).toEqual(true);
   });
 
@@ -231,14 +229,15 @@ describe('SagaTester', () => {
     sagaTester.waitFor(someActionType).then(() => done());
   });
 
-  it('Returns a promise that will resolve in the future even after an action was called', () => {
+  it('Returns a promise that will resolve in the future even after an action was called', async () => {
     const sagaTester = new SagaTester();
     sagaTester.dispatch(someAction);
     const promise = sagaTester.waitFor(someActionType, true);
-    // return expect(Promise.race([promise, Promise.resolve('fail')])).to.eventually.equal('fail').then(() => {
-    //     sagaTester.dispatch(someAction);
-    //     return expect(promise).to.be.fulfilled;
-    // });
+    await expect(
+      Promise.race([promise, Promise.resolve('fail')])
+    ).resolves.toEqual('fail');
+    sagaTester.dispatch(someAction);
+    return expect(promise).resolves.toBeUndefined();
   });
 
   it('Rejects if saga completes without emiting awaited action', () => {
@@ -250,10 +249,10 @@ describe('SagaTester', () => {
     sagaTester.run(emptySaga);
     const wait = sagaTester.waitFor(NON_EMITTED_ACTION);
 
-    // return expect(wait).to.be.rejectedWith(Error, NON_EMITTED_ACTION);
+    return expect(wait).rejects.toThrow(Error);
   });
 
-  it('Reject a promise if exception has bubbled to root saga', () => {
+  it('Reject a promise if exception has bubbled to root saga', async () => {
     const reason = 'testcase';
     const sagas = function*() {
       yield;
@@ -262,8 +261,7 @@ describe('SagaTester', () => {
     const sagaTester = new SagaTester();
     sagaTester.run(sagas);
 
-    const promise = sagaTester.waitFor(someActionType);
-    // return expect(promise).to.be.rejectedWith(Error, reason);
+    await expect(sagaTester.waitFor(someActionType)).rejects.toThrow(reason);
   });
 
   it('Gets the latest called action', () => {
@@ -301,97 +299,5 @@ describe('SagaTester', () => {
       otherAction,
       anotherAction,
     ]);
-  });
-
-  // it("Sets the state of the store - works similar to react's setState - no reducer", () => {
-  //   const someInitialState = { foo: 'bar', nestedFoo: { bo: 'jack' } };
-  //
-  //   let sagaTester = new SagaTester({ initialState: someInitialState });
-  //   sagaTester.setState({ foo: 5 });
-  //   let newState = sagaTester.getState();
-  //   expect(newState.foo).toEqual(5);
-  //   expect(newState.nestedFoo).toStrictEqual(someInitialState.nestedFoo);
-  //   expect(sagaTester.getCalledActions().length).toEqual(1); // this was a mistake, but leaving this for backward compatibility
-  //
-  //   sagaTester = new SagaTester({ initialState: someInitialState });
-  //   sagaTester.setState({ nestedFoo: { bo: 'horseman' } });
-  //   newState = sagaTester.getState();
-  //   expect(newState.foo).toEqual('bar');
-  //   expect(newState.nestedFoo).toStrictEqual({ bo: 'horseman' });
-  //   expect(sagaTester.getCalledActions().length).toEqual(1); // this was a mistake, but leaving this for backward compatibility
-  // });
-
-  // it("Sets the state of the store - works similar to react's setState - with reducer", () => {
-  //   const someInitialState = { foo: 'bar', nestedFoo: { bo: 'jack' } };
-  //   const someReducer = (state = someInitialState) => state;
-  //
-  //   let sagaTester = new SagaTester({ reducers: { someReducer } });
-  //   sagaTester.setState({ someReducer: { foo: 5 } });
-  //   let newState = sagaTester.getState();
-  //   expect(newState.someReducer.foo).toEqual(5);
-  //   expect(newState.someReducer.nestedFoo).toStrictEqual(
-  //     someInitialState.nestedFoo
-  //   );
-  //   expect(sagaTester.getCalledActions().length).toEqual(1); // this was a mistake, but leaving this for backward compatibility
-  //
-  //   sagaTester = new SagaTester({ reducers: { someReducer } });
-  //   sagaTester.setState({ someReducer: { nestedFoo: { bo: 'horseman' } } });
-  //   newState = sagaTester.getState();
-  //   expect(newState.someReducer.foo).toEqual('bar');
-  //   expect(newState.someReducer.nestedFoo).toStrictEqual({ bo: 'horseman' });
-  //   expect(sagaTester.getCalledActions().length).toEqual(1); // this was a mistake, but leaving this for backward compatibility
-  // });
-
-  it('Updates the state of the store - newer version of setState (no counting) - no reducer', () => {
-    const someInitialState = { foo: 'bar', nestedFoo: { bo: 'jack' } };
-
-    let sagaTester = new SagaTester({ initialState: someInitialState });
-    // sagaTester.updateState({ foo: 5 });
-    let newState = sagaTester.getState();
-    // expect(newState.foo).toEqual(5);
-    // expect(newState.nestedFoo).toStrictEqual(someInitialState.nestedFoo);
-    // expect(sagaTester.getCalledActions().length).toEqual(0);
-
-    sagaTester = new SagaTester({ initialState: someInitialState });
-    sagaTester.updateState({ nestedFoo: { bo: 'horseman' } });
-    newState = sagaTester.getState();
-    expect(newState.foo).toEqual('bar');
-    expect(newState.nestedFoo).toStrictEqual({ bo: 'horseman' });
-    expect(sagaTester.getCalledActions().length).toEqual(0);
-  });
-
-  it('Updates the state of the store - newer version of setState (no counting) - with reducer', () => {
-    const someInitialState = { foo: 'bar', nestedFoo: { bo: 'jack' } };
-    const someReducer = (state = someInitialState) => state;
-
-    let sagaTester = new SagaTester({ reducers: { someReducer } });
-    sagaTester.updateState({ someReducer: { foo: 5 } });
-    let newState = sagaTester.getState();
-    console.log(newState);
-    // expect(newState.someReducer.foo).toEqual(5);
-    // expect(newState.someReducer.nestedFoo).toStrictEqual(
-    //   someInitialState.nestedFoo
-    // );
-    // expect(sagaTester.getCalledActions().length).toEqual(0);
-
-    sagaTester = new SagaTester({ reducers: { someReducer } });
-    sagaTester.updateState({ someReducer: { nestedFoo: { bo: 'horseman' } } });
-    newState = sagaTester.getState();
-    // expect(newState.someReducer.foo).toEqual('bar');
-    // expect(newState.someReducer.nestedFoo).toStrictEqual({ bo: 'horseman' });
-    expect(sagaTester.getCalledActions().length).toEqual(0);
-  });
-
-  it('Handles immutable data structures with the default reducer', () => {
-    const initialState = fromJS({ foo: 'initial' });
-    const expectedState = { foo: 'bar' };
-
-    console.log(initialState);
-    const sagaTester = new SagaTester({ initialState });
-    sagaTester.updateState(expectedState);
-    const newState = sagaTester.getState();
-
-    expect(newState.toJS.prototype).toBe('function');
-    expect(newState.toJS()).toStrictEqual(expectedState);
   });
 });

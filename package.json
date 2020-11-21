@@ -4,16 +4,18 @@
   "description": "Full redux environment testing helper for redux-saga",
   "main": "dist/SagaTester.js",
   "scripts": {
-    "lint": "eslint './src/**/*.js' './test/**/*.js' './examples/**/*.js'",
+    "lint": "eslint --ext .ts,.tsx .",
     "examples": "mocha --compilers js:babel-register './examples/**/*.js'",
-    "test": "npm run test-0.15.3 && npm run test-1.0.2 && npm run lint",
+    "test": "jest",
     "test-0.15.3": "npm i --no-save redux-saga@^0.15.3 && jest",
     "test-1.0.2": "npm i --no-save redux-saga@1.0.2 && jest",
     "test-dev": "npm run test-dev-0.15.3 && npm run test-dev-1.0.2",
     "test-dev-0.15.3": "npm i --no-save redux-saga@^0.15.3 && jest",
     "test-dev-1.0.2": "npm i --no-save redux-saga@1.0.2 && jest",
     "compile": "babel -d dist/ src/",
-    "build": "tsc -p tsconfig.build.json"
+    "build": "tsc -p tsconfig.build.json",
+    "fix:lint": "eslint --ext .ts,.tsx --fix .",
+    "test:types": "tsc -p tsconfig.json --noEmit"
   },
   "repository": {
     "type": "git",
@@ -31,17 +33,28 @@
   "homepage": "https://github.com/moveaxlab/redux-saga-tester#readme",
   "devDependencies": {
     "@moveax/eslint-config": "^0.3.1",
-    "@types/jest": "^25.2.3",
+    "@types/jest": "^26.0.15",
     "@types/redux-saga": "^0.10.5",
     "eslint": "6.0.0",
-    "immutable": "^3.8.2",
+    "husky": "^4.3.0",
     "jest": "^26.0.1",
+    "jest-extended": "^0.11.5",
+    "lint-staged": "^10.5.1",
     "redux": "^4.0.5",
     "redux-saga": "^1.1.3",
-    "ts-jest": "^26.1.0",
+    "ts-jest": "^26.4.4",
     "typescript": "^3.7.5"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": "eslint --fix",
+    "*": "yarn test:types"
   }
 }

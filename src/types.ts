@@ -5,46 +5,29 @@ import {
   Reducer,
   ReducersMapObject,
 } from 'redux';
-import { Task } from '@redux-saga/types';
-
-export type SagaFunction = (...args: unknown[]) => Iterator<any>;
+import { Saga, Task } from '@redux-saga/types';
 
 export interface SagaTesterOptions<StateType> {
   initialState?: CombinedState<StateType>;
   reducers?: ReducersMapObject;
   middlewares?: Middleware[];
-  combineReducers?: (map: ReducersMapObject<AnyAction>) => Reducer<CombinedState<StateType>>;
-  ignoreReduxActions?: boolean;
-  options?: object;
-}
-
-export interface SagaTesterOption2<StateType> {
-  initialState?: StateType;
-  reducers?: ReducersMapObject;
-  middlewares?: Middleware[];
-  combineReducers?: (map: ReducersMapObject) => Reducer<StateType>;
+  combineReducers?: (
+    map: ReducersMapObject<AnyAction>
+  ) => Reducer<CombinedState<StateType>>;
   ignoreReduxActions?: boolean;
   options?: object;
 }
 
 export default abstract class SagaTester<StateType> {
-  // abstract constructor(options?: SagaTesterOptions<StateType>);
-
   /**
    * Starts execution of the provided saga.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  abstract start(saga: SagaFunction, ...args: any[]): any;
+  abstract start<S extends Saga>(sagas: S, ...args: Parameters<S>): Task;
 
   /**
    * Dispatches an action to the redux store.
    */
   abstract dispatch(action: AnyAction): void;
-
-  /**
-   * Assigns the newState into the current state. (Only works with the default reducer.)
-   */
-  abstract updateState(state: StateType): void;
 
   /**
    * Returns the state of the redux store.
